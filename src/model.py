@@ -41,7 +41,10 @@ class IbmModel1:
         self.perplexities = []
         s_total = {}
         for i in range(iterations):
-            self.perplexities.append(self._compute_perplexity(epsilon))
+            perplexity = self._compute_perplexity(epsilon)
+            self.perplexities.append(perplexity)
+
+            print(f"Iteration: {i} - Perplexity: {perplexity}")
 
             num_occurences = {}
             num_cooccurences = {}
