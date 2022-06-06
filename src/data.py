@@ -14,6 +14,7 @@ class DataGetter:
     def _preprocess_text(self, sentence):
         sentence = re.sub(r'\W+', ' ', sentence)
         sentence = re.sub(' +', ' ', sentence)
+        sentence = sentence.encode("ascii", "ignore").decode()
         return sentence.lower()
 
     def _prepare_dataset(self, path_data):
