@@ -7,13 +7,13 @@ class DataGetter:
         self._prepare_vocabulary()
 
     def _prepare_vocabulary(self):
-        for pair in self.paralell_sentences:
-            for source_word in pair[0]: 
+        for source_sentence, target_sentence in self.paralell_sentences:
+            for source_word in source_sentence:
                 self.source_vocabulary.append(source_word)
-            for target_word in pair[1]: 
+            for target_word in target_sentence:
                 self.target_vocabulary.append(target_word)
 
-        self.source_vocabulary = sorted(list(set(self.source_vocabulary)), key=lambda s: s.lower()) 
+        self.source_vocabulary = sorted(list(set(self.source_vocabulary)), key=lambda s: s.lower())
         self.target_vocabulary = sorted(list(set(self.target_vocabulary)), key=lambda s: s.lower())
 
         self.source_vocabulary_len = len(self.source_vocabulary)
