@@ -75,3 +75,55 @@ class IbmModel1:
         d = [{'key': k, 'value': v} for k, v in self.dist_t_s.items()]
         with open(self.path_model, 'w') as fp:
             json.dump(d, fp)
+
+
+class LanguageModel:
+    def __init__(self, data_getter, path_model, ngrams):
+        self.data_getter = data_getter
+        self.ngrams = ngrams
+        self.lm = {}
+
+        self.path_model = path_model
+
+    def train(self):
+        for sentence in self.data_getter.source_sentences:
+            length_sentence = len(sentence)
+
+            for i in range(length_sentence - self.ngrams):
+                ngram = sentence[i: i + self.ngrams]
+                ngram_key = tuple(ngram[:-1])
+                ngram_value = ngram[-1]
+
+                self.lm[ngram_key] = self.lm.get(ngram_key, {})
+                self.lm[ngram_key][ngram_value] = 1 + self.lm[ngram_key].get(ngram_value, 0)
+
+            for ngram_key in self.lm.keys():
+                total_count = float(sum(self.lm[ngram_key].values()))
+                for ngram_value in self.lm[ngram_key].keys():
+                    self.lm[ngram_key][ngram_value] /= total_count
+
+        d = [{'key': k, 'value': v} for k, v in self.lm.items()]
+        with open(self.path_model, 'w') as fp:
+            json.dump(d, fp)
+
+    def generate(self, text):
+
+        sentence_finished = False
+        while not sentence_finished:
+            th = np.random.random()
+            acc = .0
+
+            for word in self.lm[tuple(text[-self.ngrams + 1:])].keys():
+                acc += self.lm[tuple(text[-self.ngrams + 1:])][word]
+                if acc >= th:
+                    text.append(word)
+                    break
+
+            if (
+                text[-self.ngrams + 1:] == [None, None] or
+                acc <= th or
+                tuple(text[-self.ngrams + 1:]) not in self.lm
+                ):
+                sentence_finished = True
+
+        return (' '.join([t for t in text if t]))

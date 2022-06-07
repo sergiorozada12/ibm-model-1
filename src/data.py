@@ -5,6 +5,8 @@ import pandas as pd
 class DataGetter:
     def __init__(self, path_data):
         self.paralell_sentences = []
+        self.source_sentences = []
+        self.target_sentences = []
         self._prepare_dataset(path_data)
 
         self.source_vocabulary = []
@@ -23,6 +25,8 @@ class DataGetter:
             sentence_source = self._preprocess_text(row[1])
             sentence_target = self._preprocess_text(row[3])
 
+            self.source_sentences.append(sentence_source.split())
+            self.target_sentences.append(sentence_target.split())
             self.paralell_sentences.append([sentence_source.split(), sentence_target.split()])
 
     def _prepare_vocabulary(self):
