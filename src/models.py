@@ -127,3 +127,34 @@ class LanguageModel:
                 sentence_finished = True
 
         return (' '.join([t for t in text if t]))
+
+
+class Decoder:
+    def __init__(self, language_model, translation_model, top_k):
+        self.lm = language_model
+        self.tm = translation_model
+
+        self.top_k = top_k
+
+    def decode(self, sentence):
+        length_sentence = len(sentence)
+
+        candidates = [(key[0], self.tm.dist_t_s[key])for key in self.tm.dist_t_s.keys() if sentence[0] == key[1]]
+        first_word = sorted(candidates, key=lambda x: x[1], reverse=True)[0][0]
+
+        result = [first_word]
+
+        for i in range(1, length_sentence):
+            print(result)
+            candidates = [(key[0],key[1], self.tm.dist_t_s[key])for key in self.tm.dist_t_s.keys() if sentence[i] == key[1]]
+            sorted_candidates = sorted(candidates, key=lambda x: x[2], reverse=True)[:self.top_k]
+
+            best_candidate = 'UNK'
+            best_score = 0
+            for target_word, source_word, score in sorted_candidates:
+                score *= self.lm.lm[tuple([sentence[i - 1]])][source_word]
+                if score > best_score:
+                    best_candidate = target_word
+                    best_score = score
+            result.append(best_candidate)
+        return (' '.join([t for t in result if t]))
